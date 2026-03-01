@@ -31,9 +31,25 @@ fun Modifier.buttonSemantics(
 fun Modifier.imageSemantics(
     altText: String?
 ): Modifier = this.semantics {
+    // Always announce image role so TalkBack says "image" or "graphic"
+    role = Role.Image
     if (altText != null) {
         contentDescription = altText
-        role = Role.Image
+    }
+}
+
+/**
+ * Adds accessibility semantics for a link action.
+ * Unlike buttonSemantics, this does not set Role.Button,
+ * preventing TalkBack from announcing both "link" and "button".
+ */
+fun Modifier.linkSemantics(
+    label: String,
+    enabled: Boolean = true
+): Modifier = this.semantics {
+    contentDescription = "$label, link"
+    if (!enabled) {
+        stateDescription = "Disabled"
     }
 }
 
