@@ -4,12 +4,13 @@
 // Verifies that dropdown/choice-set components provide correct
 // collection position info for TalkBack (e.g. "1 of 4").
 
-package com.adaptivecards.accessibility
+package com.adaptivecards.core
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
-import com.adaptivecards.core.models.InputChoiceSet
-import com.adaptivecards.core.models.ChoiceInputStyle
+import com.microsoft.adaptivecards.core.models.InputChoiceSet
+import com.microsoft.adaptivecards.core.models.Choice
+import com.microsoft.adaptivecards.core.models.ChoiceInputStyle
 
 class DropdownAccessibilityTest {
 
@@ -30,7 +31,7 @@ class DropdownAccessibilityTest {
             style = style,
             isMultiSelect = isMultiSelect,
             placeholder = placeholder,
-            choices = choices.map { InputChoiceSet.Choice(title = it.first, value = it.second) },
+            choices = choices.map { Choice(title = it.first, value = it.second) },
             value = null
         )
     }

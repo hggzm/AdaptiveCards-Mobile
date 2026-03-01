@@ -21,15 +21,14 @@ final class DropdownAccessibilityTests: XCTestCase {
         isRequired: Bool = false
     ) -> ChoiceSetInput {
         ChoiceSetInput(
-            type: "Input.ChoiceSet",
             id: "test-choiceset",
-            label: label,
             isRequired: isRequired,
+            label: label,
+            choices: choices.map { ChoiceSetInput.Choice(title: $0.0, value: $0.1) },
+            value: nil,
             style: style,
             isMultiSelect: isMultiSelect,
-            placeholder: placeholder,
-            choices: choices.map { ChoiceSetInput.Choice(title: $0.0, value: $0.1) },
-            value: nil
+            placeholder: placeholder
         )
     }
 
