@@ -22,6 +22,7 @@ import com.microsoft.adaptivecards.hostconfig.LocalHostConfig
 import com.microsoft.adaptivecards.rendering.viewmodel.ActionHandler
 import com.microsoft.adaptivecards.rendering.viewmodel.CardViewModel
 import com.microsoft.adaptivecards.accessibility.buttonSemantics
+import com.microsoft.adaptivecards.accessibility.linkSemantics
 
 /**
  * Renders an ActionSet as a row or column of action buttons.
@@ -141,16 +142,27 @@ fun ActionButton(
     // Use tooltip as content description for accessibility when available
     val tooltipText = action.tooltip
 
+    // Use link semantics for ActionOpenUrl to avoid TalkBack announcing
+    // both "link" and "button" (upstream #492)
+    val semanticsModifier = if (action is com.microsoft.adaptivecards.core.models.ActionOpenUrl) {
+        modifier.linkSemantics(
+            label = tooltipText ?: action.title ?: "Link",
+            enabled = action.isEnabled
+        )
+    } else {
+        modifier.buttonSemantics(
+            label = tooltipText ?: action.title ?: "Action",
+            enabled = action.isEnabled
+        )
+    }
+
     Button(
         onClick = {
             handleAction(action, actionHandler, viewModel)
         },
         enabled = action.isEnabled,
         colors = buttonColors,
-        modifier = modifier.buttonSemantics(
-            label = tooltipText ?: action.title ?: "Action",
-            enabled = action.isEnabled
-        )
+        modifier = semanticsModifier
     ) {
         Text(action.title ?: "")
     }

@@ -48,6 +48,10 @@ public struct ActionButton: View {
         .buttonStyle(.plain)
         .disabled(!(isEnabled ?? true))
         .accessibilityAction(label: title, hint: tooltip)
+        .if(isOpenUrl) { view in
+            view.accessibilityRemoveTraits(.isButton)
+                .accessibilityAddTraits(.isLink)
+        }
     }
 
     private var title: String? {
@@ -112,6 +116,14 @@ public struct ActionButton: View {
         case .popover(let a): return a.isEnabled
         case .runCommands(let a): return a.isEnabled
         case .openUrlDialog(let a): return a.isEnabled
+        }
+    }
+
+    /// Whether this action opens a URL (should use link trait, not button)
+    private var isOpenUrl: Bool {
+        switch action {
+        case .openUrl, .openUrlDialog: return true
+        default: return false
         }
     }
 
