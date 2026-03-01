@@ -30,11 +30,27 @@ public struct ChoiceSetInputView: View {
     }
 
     public var body: some View {
+        let isExpanded = (input.style ?? .compact) == .expanded
+
         VStack(alignment: .leading, spacing: 4) {
             if let label = input.label {
-                Text(label)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                if isExpanded {
+                    // For expanded style, the label is a standalone accessible
+                    // text element. Required state goes here instead of the
+                    // parent container so it is not repeated per item (#483).
+                    Text(label)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .accessibilityLabel(
+                            (input.isRequired == true)
+                                ? "\(label), required"
+                                : label
+                        )
+                } else {
+                    Text(label)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
 
             switch input.style ?? .compact {
@@ -52,7 +68,13 @@ public struct ChoiceSetInputView: View {
                     .foregroundColor(.red)
             }
         }
-        .accessibilityInput(
+        // For expanded style, do NOT apply accessibilityInput to the outer
+        // container — it causes VoiceOver to repeat the group label with
+        // every radio button / checkbox (upstream #483).  The label Text
+        // carries the required state and accessibilityChoiceList provides
+        // the group "N options" announcement.
+        .conditionalAccessibilityInput(
+            apply: !isExpanded,
             label: input.label ?? "Choice set",
             value: input.displayText(forValue: value),
             isRequired: input.isRequired ?? false
@@ -171,6 +193,25 @@ public struct ChoiceSetInputView: View {
     private func validateIfNeeded() {
         let error = InputValidator.validateChoiceSet(value: value, input: input)
         validationState.setError(for: input.id, message: error)
+    }
+}
+
+// MARK: - Conditional Accessibility Input
+/// Applies accessibilityInput only when the condition is true, preventing
+/// VoiceOver from repeating the group label on every child in expanded mode.
+private extension View {
+    @ViewBuilder
+    func conditionalAccessibilityInput(
+        apply: Bool,
+        label: String,
+        value: String?,
+        isRequired: Bool
+    ) -> some View {
+        if apply {
+            self.accessibilityInput(label: label, value: value, isRequired: isRequired)
+        } else {
+            self
+        }
     }
 }
 
