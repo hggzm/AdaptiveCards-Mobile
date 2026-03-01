@@ -133,6 +133,23 @@ The following pre-existing bugs were fixed to get the gate passing:
 | `SnapshotTestCase.swift` | `MainActor.assumeIsolated` iOS 17 availability | `aedbb36` |
 | `HostConfig.swift` (FontSizesConfig) | Default font size 12 → 14 | `2bf219e` |
 
+
+---
+
+## Fork PR Activity Log
+
+| PR # | Branch | Description | CI Status | Agent Tag | Date |
+|------|--------|-------------|-----------|-----------|------|
+| #1 | `proxy/add-feature-flag-tests` | Comprehensive unit tests for AdaptiveCardFeatureFlags (iOS 13 + Android 13 tests) |  Gate PASSED (run 22551453860) | @copilot tagged | 2026-03-01 |
+
+### PR #1 Details
+- **Commit**: `b6c1176`
+- **Base**: `proxy/integration`
+- **Files Added**:
+  - `ios/Tests/ACCoreTests/FeatureFlagTests.swift`  13 XCTest cases
+  - `android/ac-core/src/test/kotlin/.../AdaptiveCardFeatureFlagsTest.kt`  13 JUnit 5 tests
+- **Coverage**: defaults, individual toggles, enableAllVisualParity(), resetAll(), anyVisualParityEnabled, singleton identity, flag independence, parity combinations
+- **Dashboard Jobs**: `github-issues-sync-dev-fork`, `github-work-state-tracker-dev-fork` registered
 ### PR #47: fix: ChoiceSet renders title instead of value
 - **Branch:** proxy/fix-choiceset-title-display
 - **Issue:** #38 (upstream microsoft/Teams-AdaptiveCards-Mobile#391)
