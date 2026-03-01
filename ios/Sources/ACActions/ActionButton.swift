@@ -48,11 +48,9 @@ public struct ActionButton: View {
         .buttonStyle(.plain)
         .disabled(!(isEnabled ?? true))
         .accessibilityAction(label: title, hint: tooltip)
-        .if(isOpenUrl) { view in
-            view.accessibilityRemoveTraits(.isButton)
-                .accessibilityAddTraits(.isLink)
+        .accessibilityRemoveTraits(isOpenUrl ? .isButton : [])
+        .accessibilityAddTraits(isOpenUrl ? .isLink : [])
         }
-    }
 
     private var title: String? {
         switch action {
@@ -65,7 +63,6 @@ public struct ActionButton: View {
         case .runCommands(let a): return a.title
         case .openUrlDialog(let a): return a.title
         }
-    }
 
     private var iconUrl: String? {
         switch action {
@@ -78,7 +75,6 @@ public struct ActionButton: View {
         case .runCommands(let a): return a.iconUrl
         case .openUrlDialog(let a): return a.iconUrl
         }
-    }
 
     private var style: ActionStyle? {
         switch action {
@@ -91,7 +87,6 @@ public struct ActionButton: View {
         case .runCommands(let a): return a.style
         case .openUrlDialog(let a): return a.style
         }
-    }
 
     private var tooltip: String? {
         switch action {
@@ -104,7 +99,6 @@ public struct ActionButton: View {
         case .runCommands(let a): return a.tooltip
         case .openUrlDialog(let a): return a.tooltip
         }
-    }
 
     private var isEnabled: Bool? {
         switch action {
@@ -117,7 +111,6 @@ public struct ActionButton: View {
         case .runCommands(let a): return a.isEnabled
         case .openUrlDialog(let a): return a.isEnabled
         }
-    }
 
     /// Whether this action opens a URL (should use link trait, not button)
     private var isOpenUrl: Bool {
@@ -125,7 +118,6 @@ public struct ActionButton: View {
         case .openUrl, .openUrlDialog: return true
         default: return false
         }
-    }
 
     private var backgroundColor: Color {
         let actionStyle = style ?? .default
@@ -139,7 +131,6 @@ public struct ActionButton: View {
         case .destructive:
             return Color(hex: colors.attention.`default`)
         }
-    }
 
     private var foregroundColor: Color {
         return .white
@@ -158,7 +149,6 @@ public struct ActionButton: View {
         case .destructive:
             return .clear
         }
-    }
 
     /// Foreground text color matching legacy renderer
     private var buttonForegroundColor: Color {
@@ -171,5 +161,4 @@ public struct ActionButton: View {
         case .destructive:
             return Color(hex: colors.attention.`default`)
         }
-    }
 }
