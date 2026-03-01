@@ -150,3 +150,9 @@ The following pre-existing bugs were fixed to get the gate passing:
   - `android/ac-core/src/test/kotlin/.../AdaptiveCardFeatureFlagsTest.kt`  13 JUnit 5 tests
 - **Coverage**: defaults, individual toggles, enableAllVisualParity(), resetAll(), anyVisualParityEnabled, singleton identity, flag independence, parity combinations
 - **Dashboard Jobs**: `github-issues-sync-dev-fork`, `github-work-state-tracker-dev-fork` registered
+### PR #47: fix: ChoiceSet renders title instead of value
+- **Branch:** proxy/fix-choiceset-title-display
+- **Issue:** #38 (upstream microsoft/Teams-AdaptiveCards-Mobile#391)
+- **Status:** Open  Agent Gate PASSED
+- **Changes:** Added resolveTitle/displayText methods to ChoiceSetInput (iOS) and InputChoiceSet (Android), fixed accessibility, added FilteredChoiceSetView, 30 total tests
+- **CI Run:** Agent Validation Gate SUCCESS (all required gates passed)
