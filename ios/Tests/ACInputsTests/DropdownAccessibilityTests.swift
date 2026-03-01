@@ -153,16 +153,16 @@ final class DropdownAccessibilityTests: XCTestCase {
 
     func testRequiredFieldAccessibilityLabel() {
         let label = "Sample label"
-        let isRequired = true
-        let accessibilityLabel = isRequired ? "\(label), required, popup button" : "\(label), popup button"
+        // Build label the same way the accessibility modifier does for isRequired=true
+        let accessibilityLabel = "\(label), required, popup button"
         XCTAssertTrue(accessibilityLabel.contains("required"),
                       "Required dropdown should include 'required' in accessibility label")
     }
 
     func testOptionalFieldAccessibilityLabel() {
         let label = "Sample label"
-        let isRequired = false
-        let accessibilityLabel = isRequired ? "\(label), required, popup button" : "\(label), popup button"
+        // Build label the same way the accessibility modifier does for isRequired=false
+        let accessibilityLabel = "\(label), popup button"
         XCTAssertFalse(accessibilityLabel.contains("required"),
                        "Optional dropdown should not include 'required'")
     }
