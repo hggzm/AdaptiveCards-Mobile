@@ -65,7 +65,13 @@ jobs:
 
     - name: Run parse validation (all cards)
       working-directory: ios
-      run: swift test --filter "AllCardsDiscoveryTests/testAllCards_parseOnly"
+      run: |
+        xcodebuild test \
+          -scheme AdaptiveCards-Package \
+          -sdk iphonesimulator \
+          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_parseOnly \
+          CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
     - name: Run visual smoke test (1 config per card)
       working-directory: ios
@@ -77,14 +83,26 @@ jobs:
         else
           echo "🟢 VERIFY MODE — comparing against baselines"
         fi
-        swift test --filter "AllCardsDiscoveryTests/testAllCards_smokeTest" 2>&1 || true
+        xcodebuild test \
+          -scheme AdaptiveCards-Package \
+          -sdk iphonesimulator \
+          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_smokeTest \
+          CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+          2>&1 || true
 
     - name: Run core matrix test (4 configs per card)
       working-directory: ios
       env:
         RECORD_SNAPSHOTS: ${{ github.event.inputs.record_baselines == 'true' && '1' || '' }}
       run: |
-        swift test --filter "AllCardsDiscoveryTests/testAllCards_coreMatrix" 2>&1 || true
+        xcodebuild test \
+          -scheme AdaptiveCards-Package \
+          -sdk iphonesimulator \
+          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_coreMatrix \
+          CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+          2>&1 || true
 
     - name: Upload baselines
       if: always()

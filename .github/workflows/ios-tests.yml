@@ -38,13 +38,28 @@ jobs:
       
     - name: Build iOS Package
       working-directory: ios
-      run: swift build
+      run: |
+        xcodebuild build \
+          -scheme AdaptiveCards-Package \
+          -sdk iphonesimulator \
+          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
       
     - name: Run Unit Tests
       working-directory: ios
       run: |
-        swift test --parallel --enable-code-coverage \
-          --filter "ACCoreTests|ACRenderingTests|ACInputsTests|ACTemplatingTests|ACMarkdownTests|ACChartsTests|IntegrationTests"
+        xcodebuild test \
+          -scheme AdaptiveCards-Package \
+          -sdk iphonesimulator \
+          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          -only-testing:ACCoreTests \
+          -only-testing:ACRenderingTests \
+          -only-testing:ACInputsTests \
+          -only-testing:ACTemplatingTests \
+          -only-testing:ACMarkdownTests \
+          -only-testing:ACChartsTests \
+          -only-testing:IntegrationTests \
+          CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
       
     - name: Upload Test Results
       if: always()
@@ -154,4 +169,9 @@ jobs:
     - name: Validate all cards parse
       working-directory: ios
       run: |
-        swift test --filter "AllCardsDiscoveryTests/testAllCards_parseOnly"
+        xcodebuild test \
+          -scheme AdaptiveCards-Package \
+          -sdk iphonesimulator \
+          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_parseOnly \
+          CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO

@@ -153,7 +153,6 @@ jobs:
   ios-parse-validation:
     name: "2b. iOS Parse Validation"
     runs-on: macos-14
-    continue-on-error: true  # Advisory: known fatalError in some card types
     steps:
     - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
@@ -161,7 +160,23 @@ jobs:
         xcode-version: '15.2'
     - name: Validate all cards parse correctly
       working-directory: ios
-      run: swift test --filter "AllCardsDiscoveryTests/testAllCards_parseOnly"
+      run: |
+        # Use xcodebuild (iOS Simulator target) instead of swift test (macOS target)
+        # swift test compiles for macOS where UIColor system colors don't exist
+        xcodebuild test \
+          -scheme AdaptiveCards-Package \
+          -sdk iphonesimulator \
+          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_parseOnly \
+          CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+          2>&1 | tee /tmp/ios-parse-validation.log
+
+        if grep -q "\*\* TEST SUCCEEDED \*\*" /tmp/ios-parse-validation.log; then
+          echo "### iOS Parse Validation: PASSED" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### iOS Parse Validation: FAILED" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
 
   android-unit-tests:
     name: "2c. Android Unit Tests"
@@ -257,14 +272,26 @@ jobs:
       env:
         RECORD_SNAPSHOTS: ${{ github.event.inputs.record_baselines == 'true' && '1' || '' }}
       run: |
-        swift test --filter "AllCardsDiscoveryTests/testAllCards_smokeTest" 2>&1 || true
+        xcodebuild test \
+          -scheme AdaptiveCards-Package \
+          -sdk iphonesimulator \
+          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_smokeTest \
+          CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+          2>&1 || true
 
     - name: Run core matrix test (4 configs per card)
       working-directory: ios
       env:
         RECORD_SNAPSHOTS: ${{ github.event.inputs.record_baselines == 'true' && '1' || '' }}
       run: |
-        swift test --filter "AllCardsDiscoveryTests/testAllCards_coreMatrix" 2>&1 || true
+        xcodebuild test \
+          -scheme AdaptiveCards-Package \
+          -sdk iphonesimulator \
+          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_coreMatrix \
+          CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+          2>&1 || true
 
     - name: Upload baselines
       if: always()
@@ -458,6 +485,7 @@ jobs:
         check_required "iOS Unit Tests" "${{ needs.ios-unit-tests.result }}"
         check_required "Android Unit Tests" "${{ needs.android-unit-tests.result }}"
         check_required "Parity Check" "${{ needs.parity-check.result }}"
+        check_required "iOS Parse Validation" "${{ needs.ios-parse-validation.result }}"
 
         echo ""
         echo "--- Advisory (non-blocking) ---"
@@ -475,7 +503,6 @@ jobs:
           fi
         }
 
-        advisory "iOS Parse Validation" "${{ needs.ios-parse-validation.result }}"
         advisory "iOS Visual Regression" "${{ needs.ios-visual-tests.result }}"
         advisory "Android Visual Regression" "${{ needs.android-visual-tests.result }}"
 
