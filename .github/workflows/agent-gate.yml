@@ -233,6 +233,7 @@ jobs:
     name: "3a. iOS Visual Regression"
     # Runs independently - visual tests build the project separately
     runs-on: macos-14
+    timeout-minutes: 45
     steps:
     - uses: actions/checkout@v4
 
