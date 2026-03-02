@@ -9,7 +9,9 @@ import androidx.compose.ui.semantics.collectionItemInfo
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.LiveRegionMode
 
 /**
  * Adds accessibility semantics for a button.
@@ -224,4 +226,40 @@ fun Modifier.radioGroupItemSemantics(
         columnIndex = 0,
         columnSpan = 1
     )
+}
+
+
+/**
+ * Adds LiveRegion.Polite semantics to an error message so TalkBack
+ * automatically announces new error text when it appears or changes.
+ * This fixes upstream #493 where TalkBack did not announce validation
+ * error messages when the submit button was activated.
+ */
+fun Modifier.errorSemantics(
+    errorMessage: String
+): Modifier = this.semantics {
+    liveRegion = LiveRegionMode.Polite
+    contentDescription = errorMessage
+}
+
+/**
+ * Adds accessibility semantics for a text input that includes the
+ * current validation error, if any.  When there is an error, TalkBack
+ * will announce it as part of the input description.
+ */
+fun Modifier.inputWithErrorSemantics(
+    label: String,
+    value: String,
+    isRequired: Boolean = false,
+    error: String? = null
+): Modifier = this.semantics(mergeDescendants = true) {
+    val parts = mutableListOf<String>()
+    parts.add(label)
+    if (isRequired) parts.add("required")
+    if (value.isNotEmpty()) parts.add("current value: $value")
+    if (error != null) parts.add("Error: $error")
+    contentDescription = parts.joinToString(", ")
+    if (value.isEmpty()) {
+        stateDescription = "Empty"
+    }
 }
