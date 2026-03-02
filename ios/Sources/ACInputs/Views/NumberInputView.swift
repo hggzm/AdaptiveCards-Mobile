@@ -44,8 +44,10 @@ public struct NumberInputView: View {
         .accessibilityInput(
             label: input.label ?? input.placeholder,
             value: textValue,
-            isRequired: input.isRequired ?? false
+            isRequired: input.isRequired ?? false,
+            error: validationState.getError(for: input.id)
         )
+        .accessibilityAnnounceError(validationState.getError(for: input.id))
     }
 
     @ViewBuilder

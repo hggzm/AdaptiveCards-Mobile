@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 // MARK: - Accessibility Labels and Hints
 
@@ -16,9 +19,10 @@ public extension View {
     func accessibilityInput(
         label: String?,
         value: String?,
-        isRequired: Bool = false
+        isRequired: Bool = false,
+        error: String? = nil
     ) -> some View {
-        self.modifier(AccessibilityInputModifier(label: label, value: value, isRequired: isRequired))
+        self.modifier(AccessibilityInputModifier(label: label, value: value, isRequired: isRequired, error: error))
     }
 
     /// Adds accessibility for action buttons
@@ -51,6 +55,14 @@ private struct AccessibilityInputModifier: ViewModifier {
     let label: String?
     let value: String?
     let isRequired: Bool
+    let error: String?
+
+    init(label: String?, value: String?, isRequired: Bool, error: String? = nil) {
+        self.label = label
+        self.value = value
+        self.isRequired = isRequired
+        self.error = error
+    }
 
     func body(content: Content) -> some View {
         var accessibilityLabel = label ?? "Input field"
@@ -59,6 +71,9 @@ private struct AccessibilityInputModifier: ViewModifier {
         }
         if let value = value, !value.isEmpty {
             accessibilityLabel += ", current value: \(value)"
+        }
+        if let error = error {
+            accessibilityLabel += ", Error: \(error)"
         }
 
         return content
@@ -133,5 +148,23 @@ public extension View {
         self
             .accessibilityElement(children: .contain)
             .accessibilityLabel("\(label), \(count) options")
+    }
+}
+
+
+// MARK: - Error Announcement
+
+public extension View {
+    /// Posts a VoiceOver announcement when an error message appears or changes.
+    /// This ensures screen reader users are notified of validation errors
+    /// without needing to manually navigate to them (upstream #493).
+    func accessibilityAnnounceError(_ error: String?) -> some View {
+        self.onChange(of: error) { newError in
+            #if canImport(UIKit)
+            if let message = newError {
+                UIAccessibility.post(notification: .announcement, argument: message)
+            }
+            #endif
+        }
     }
 }
