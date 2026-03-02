@@ -75,8 +75,8 @@ final class ContainerFocusRequiredTests: XCTestCase {
             ]}
         """)
 
-        if case .inputText(let input) = card.body?[0] {
-            XCTAssertTrue(input.isRequired, "isRequired must be true")
+        if case .textInput(let input) = card.body?[0] {
+            XCTAssertTrue(input.isRequired ?? false, "isRequired must be true")
             XCTAssertEqual(input.label, "Name")
             XCTAssertEqual(input.errorMessage, "Name is required")
         } else {
@@ -92,7 +92,7 @@ final class ContainerFocusRequiredTests: XCTestCase {
             ]}
         """)
 
-        if case .inputNumber(let input) = card.body?[0] {
+        if case .numberInput(let input) = card.body?[0] {
             XCTAssertTrue(input.isRequired ?? false, "isRequired must be true")
             XCTAssertEqual(input.label, "Age")
         } else {
@@ -108,7 +108,7 @@ final class ContainerFocusRequiredTests: XCTestCase {
             ]}
         """)
 
-        if case .inputToggle(let input) = card.body?[0] {
+        if case .toggleInput(let input) = card.body?[0] {
             XCTAssertTrue(input.isRequired ?? false, "isRequired must be true for toggle")
             XCTAssertEqual(input.label, "Agreement")
         } else {
@@ -123,8 +123,8 @@ final class ContainerFocusRequiredTests: XCTestCase {
             ]}
         """)
 
-        if case .inputText(let input) = card.body?[0] {
-            XCTAssertFalse(input.isRequired, "isRequired should default to false")
+        if case .textInput(let input) = card.body?[0] {
+            XCTAssertNil(input.isRequired, "isRequired should default to nil")
         } else {
             XCTFail("Expected Input.Text")
         }
@@ -142,7 +142,7 @@ final class ContainerFocusRequiredTests: XCTestCase {
             ]}
         """)
 
-        if case .inputChoiceSet(let input) = card.body?[0] {
+        if case .choiceSetInput(let input) = card.body?[0] {
             XCTAssertTrue(input.isRequired ?? false, "isRequired must be true for ChoiceSet")
         } else {
             XCTFail("Expected Input.ChoiceSet")
