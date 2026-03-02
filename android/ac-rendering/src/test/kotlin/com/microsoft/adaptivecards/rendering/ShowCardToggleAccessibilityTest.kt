@@ -283,7 +283,7 @@ class ShowCardToggleAccessibilityTest {
     // MARK: - Helper
 
     private fun parseCard(json: String): AdaptiveCard {
-        val parser = CardParser()
+        val parser = CardParser
         return parser.parse(json.trimIndent())
     }
 }

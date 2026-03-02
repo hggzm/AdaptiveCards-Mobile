@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test
 class ErrorMessageAccessibilityTest {
 
     private fun parseCard(json: String): AdaptiveCard =
-        CardParser().parse(json)
+        CardParser.parse(json)
 
     // MARK: - Required field parsing
 
