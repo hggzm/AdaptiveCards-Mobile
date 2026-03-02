@@ -26,15 +26,15 @@ fun FlowLayoutView(
     hostConfig: HostConfig,
     modifier: Modifier = Modifier
 ) {
-    val colSpacing = spacingToDp(flowLayout.columnSpacing ?: Spacing.DEFAULT, hostConfig)
-    val rowSpacing = spacingToDp(flowLayout.rowSpacing ?: Spacing.DEFAULT, hostConfig)
+    val colSpacing = spacingToDp(flowLayout.columnSpacing ?: Spacing.Default, hostConfig)
+    val rowSpacing = spacingToDp(flowLayout.rowSpacing ?: Spacing.Default, hostConfig)
 
     FlowRow(
         horizontalSpacing = colSpacing,
         verticalSpacing = rowSpacing,
         horizontalAlignment = when (flowLayout.horizontalAlignment) {
-            HorizontalAlignment.CENTER -> Alignment.CenterHorizontally
-            HorizontalAlignment.RIGHT -> Alignment.End
+            HorizontalAlignment.Center -> Alignment.CenterHorizontally
+            HorizontalAlignment.Right -> Alignment.End
             else -> Alignment.Start
         },
         modifier = modifier
@@ -48,7 +48,7 @@ fun FlowLayoutView(
                 .then(if (itemWidthDp != null) Modifier.width(itemWidthDp) else Modifier)
                 .then(if (minWidthDp != null) Modifier.widthIn(min = minWidthDp) else Modifier)
                 .then(if (maxWidthDp != null) Modifier.widthIn(max = maxWidthDp) else Modifier)
-                .then(if (flowLayout.itemFit == ItemFit.FILL) Modifier.weight(1f) else Modifier)
+                .then(if (flowLayout.itemFit == ItemFit.FILL) Modifier.fillMaxWidth() else Modifier)
 
             Box(modifier = itemModifier) {
                 ElementRenderer(element = item, hostConfig = hostConfig)
@@ -148,8 +148,8 @@ fun AreaGridLayoutView(
     hostConfig: HostConfig,
     modifier: Modifier = Modifier
 ) {
-    val colSpacing = spacingToDp(gridLayout.columnSpacing ?: Spacing.DEFAULT, hostConfig)
-    val rowSpacing = spacingToDp(gridLayout.rowSpacing ?: Spacing.DEFAULT, hostConfig)
+    val colSpacing = spacingToDp(gridLayout.columnSpacing ?: Spacing.Default, hostConfig)
+    val rowSpacing = spacingToDp(gridLayout.rowSpacing ?: Spacing.Default, hostConfig)
     val maxRow = gridLayout.areas.maxOfOrNull { it.row + (it.rowSpan ?: 1) - 1 } ?: 1
     val columnCount = gridLayout.columns.size.coerceAtLeast(1)
 
@@ -211,13 +211,13 @@ private fun parseFractionWeight(colDef: String): Float {
  */
 private fun spacingToDp(spacing: Spacing, hostConfig: HostConfig): Dp {
     return when (spacing) {
-        Spacing.NONE -> 0.dp
-        Spacing.SMALL -> hostConfig.spacing.small.dp
-        Spacing.DEFAULT -> hostConfig.spacing.defaultSpacing.dp
-        Spacing.MEDIUM -> hostConfig.spacing.medium.dp
-        Spacing.LARGE -> hostConfig.spacing.large.dp
-        Spacing.EXTRA_LARGE -> hostConfig.spacing.extraLarge.dp
-        Spacing.PADDING -> hostConfig.spacing.padding.dp
+        Spacing.None -> 0.dp
+        Spacing.Small -> hostConfig.spacing.small.dp
+        Spacing.Default -> hostConfig.spacing.`default`.dp
+        Spacing.Medium -> hostConfig.spacing.medium.dp
+        Spacing.Large -> hostConfig.spacing.large.dp
+        Spacing.ExtraLarge -> hostConfig.spacing.extraLarge.dp
+        Spacing.Padding -> hostConfig.spacing.padding.dp
     }
 }
 
@@ -228,4 +228,18 @@ private fun parseSizeDp(value: String?): Dp? {
     if (value == null) return null
     val cleaned = value.replace("px", "")
     return cleaned.toFloatOrNull()?.dp
+}
+
+/**
+ * Stub composable for rendering a single card element.
+ * TODO: Wire up to the actual element rendering pipeline (RenderElement).
+ */
+@Composable
+private fun ElementRenderer(
+    element: CardElement,
+    hostConfig: HostConfig,
+    modifier: Modifier = Modifier
+) {
+    // Placeholder — will be connected to the rendering registry in a future PR
+    Box(modifier = modifier) {}
 }
