@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test
 class ProgressBarAccessibilityTest {
 
     private fun parseCard(json: String): AdaptiveCard =
-        CardParser().parse(json)
+        CardParser.parse(json)
 
     // MARK: - ProgressBar parsing
 

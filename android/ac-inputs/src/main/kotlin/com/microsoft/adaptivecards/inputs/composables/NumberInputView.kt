@@ -11,6 +11,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.microsoft.adaptivecards.core.models.InputNumber
 import com.microsoft.adaptivecards.accessibility.errorSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.microsoft.adaptivecards.inputs.validation.InputValidator
 import com.microsoft.adaptivecards.rendering.viewmodel.CardViewModel
 
