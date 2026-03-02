@@ -99,16 +99,12 @@ private struct AccessibilityActionModifier: ViewModifier {
 // MARK: - Accessibility Container
 
 public extension View {
-    /// Groups related elements into an accessibility container
+    /// Groups related elements into an accessibility container.
+    /// Note: Do NOT set .accessibilityLabel() on a .contain container —
+    /// VoiceOver would announce "<label> Group" after every child element
+    /// (upstream #164).  Children speak for themselves.
     func accessibilityContainer(label: String? = nil) -> some View {
-        Group {
-            if let label = label {
-                self.accessibilityElement(children: .contain)
-                    .accessibilityLabel(label)
-            } else {
-                self.accessibilityElement(children: .contain)
-            }
-        }
+        self.accessibilityElement(children: .contain)
     }
 }
 

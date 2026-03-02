@@ -14,6 +14,11 @@ struct ActionSetView: View {
     @Environment(\.actionDelegate) var actionDelegate
     @EnvironmentObject var viewModel: CardViewModel
 
+    /// Tracks which ShowCard content has VoiceOver focus.
+    /// Setting this to a ShowCard's actionId moves focus to that
+    /// content area after it expands (upstream #166, #165).
+    @AccessibilityFocusState private var focusedShowCardId: String?
+
     var body: some View {
         Group {
             if orientation == .horizontal {
@@ -28,11 +33,24 @@ struct ActionSetView: View {
         }
         .frame(maxWidth: .infinity, alignment: alignment)
         .accessibilityContainer(label: "Actions")
-        .onChange(of: viewModel.showCards) { _ in
-            // Notify VoiceOver that the layout changed so it can
-            // discover newly-revealed ShowCard content (upstream #181).
+        .onChange(of: viewModel.showCards) { [oldShowCards = viewModel.showCards] newShowCards in
+            // Move VoiceOver focus to newly-expanded ShowCard content
+            // (upstream #166) or notify layout changed on collapse (#165).
+            for (actionId, isExpanded) in newShowCards {
+                let wasExpanded = oldShowCards[actionId] ?? false
+                if isExpanded && !wasExpanded {
+                    // Card was expanded — move focus to its content
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        focusedShowCardId = actionId
+                    }
+                    return
+                }
+            }
+            // Collapsed or other change — notify VoiceOver
             #if canImport(UIKit)
-            UIAccessibility.post(notification: .layoutChanged, argument: nil)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                UIAccessibility.post(notification: .layoutChanged, argument: nil)
+            }
             #endif
         }
     }
@@ -96,6 +114,7 @@ struct ActionSetView: View {
                 }
                 .accessibilityElement(children: .contain)
                 .accessibilityLabel("\(showCardInfo.title) content")
+                .accessibilityFocused($focusedShowCardId, equals: showCardInfo.actionId)
             }
         }
     }

@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.microsoft.adaptivecards.core.models.InputText
 import com.microsoft.adaptivecards.core.models.TextInputStyle
 import com.microsoft.adaptivecards.accessibility.errorSemantics
+import androidx.compose.ui.semantics.contentDescription
 import com.microsoft.adaptivecards.inputs.validation.InputValidator
 import com.microsoft.adaptivecards.rendering.viewmodel.CardViewModel
 
@@ -48,10 +49,14 @@ fun TextInputView(
     }
     
     Column(modifier = modifier.fillMaxWidth()) {
-        // Label
+        // Label — announce "required" for TalkBack (upstream #205, #274)
         element.label?.let { label ->
+            val labelText = if (element.isRequired) "$label *" else label
             Text(
-                text = if (element.isRequired) "$label *" else label
+                text = labelText,
+                modifier = if (element.isRequired) Modifier.semantics {
+                    contentDescription = "$label, required"
+                } else Modifier
             )
         }
         

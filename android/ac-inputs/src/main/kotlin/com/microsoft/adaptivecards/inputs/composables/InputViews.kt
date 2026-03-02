@@ -14,6 +14,7 @@ import com.microsoft.adaptivecards.accessibility.dropdownItemSemantics
 import com.microsoft.adaptivecards.accessibility.dropdownMenuSemantics
 import com.microsoft.adaptivecards.accessibility.dropdownSemantics
 import com.microsoft.adaptivecards.accessibility.radioGroupItemSemantics
+import androidx.compose.ui.semantics.contentDescription
 import com.microsoft.adaptivecards.core.models.*
 import com.microsoft.adaptivecards.inputs.validation.InputValidator
 import com.microsoft.adaptivecards.rendering.viewmodel.CardViewModel
@@ -37,7 +38,13 @@ fun DateInputView(
     
     Column(modifier = modifier.fillMaxWidth()) {
         element.label?.let { label ->
-            Text(text = if (element.isRequired) "$label *" else label)
+            val labelText = if (element.isRequired) "$label *" else label
+            Text(
+                text = labelText,
+                modifier = if (element.isRequired) Modifier.semantics {
+                    contentDescription = "$label, required"
+                } else Modifier
+            )
         }
         
         OutlinedTextField(
@@ -68,7 +75,13 @@ fun TimeInputView(
     
     Column(modifier = modifier.fillMaxWidth()) {
         element.label?.let { label ->
-            Text(text = if (element.isRequired) "$label *" else label)
+            val labelText = if (element.isRequired) "$label *" else label
+            Text(
+                text = labelText,
+                modifier = if (element.isRequired) Modifier.semantics {
+                    contentDescription = "$label, required"
+                } else Modifier
+            )
         }
         
         OutlinedTextField(
@@ -105,7 +118,13 @@ fun ToggleInputView(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             element.label?.let { label ->
-                Text(text = if (element.isRequired) "$label *" else label)
+                val labelText = if (element.isRequired) "$label *" else label
+                Text(
+                    text = labelText,
+                    modifier = if (element.isRequired) Modifier.semantics {
+                        contentDescription = "$label, required"
+                    } else Modifier
+                )
             }
             Text(text = element.title)
         }
@@ -136,7 +155,13 @@ fun ChoiceSetInputView(
     
     Column(modifier = modifier.fillMaxWidth()) {
         element.label?.let { label ->
-            Text(text = if (element.isRequired) "$label *" else label)
+            val labelText = if (element.isRequired) "$label *" else label
+            Text(
+                text = labelText,
+                modifier = if (element.isRequired) Modifier.semantics {
+                    contentDescription = "$label, required"
+                } else Modifier
+            )
         }
         
         when (element.style) {

@@ -64,7 +64,7 @@ public struct RatingInputView: View {
         }
         // TODO: Re-add spacing and separator modifiers if ACRendering is added as dependency
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(input.label ?? "Rating input")
+        .accessibilityLabel((input.label ?? "Rating input") + (input.isRequired == true ? ", required" : ""))
         .accessibilityValue("\(Int(value.rounded(.up))) out of \(maxStars) stars selected")
     }
 

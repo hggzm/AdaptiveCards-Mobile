@@ -31,7 +31,7 @@ public struct ToggleInputView: View {
         .accessibilityInput(
             label: input.label ?? input.title,
             value: value ? "On" : "Off",
-            isRequired: false
+            isRequired: input.isRequired ?? false
         )
     }
 }
