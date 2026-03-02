@@ -63,13 +63,28 @@ jobs:
         done
         echo "Total: $(find shared/test-cards -name '*.json' | wc -l | tr -d ' ') cards"
 
+    - name: Boot iOS Simulator
+      run: |
+        SIMULATOR=$(xcrun simctl list devices available --json | python3 -c "
+        import json, sys
+        devices = json.load(sys.stdin)['devices']
+        for runtime, devs in devices.items():
+          if 'iOS' in runtime:
+            for d in devs:
+              if 'iPhone' in d['name']:
+                print(d['udid']); sys.exit(0)
+        ")
+        echo "SIM_UDID=$SIMULATOR" >> $GITHUB_ENV
+        xcrun simctl boot "$SIMULATOR" 2>/dev/null || true
+        echo "Using simulator: $SIMULATOR"
+
     - name: Run parse validation (all cards)
       working-directory: ios
       run: |
         xcodebuild test \
           -scheme AdaptiveCards-Package \
           -sdk iphonesimulator \
-          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          -destination "platform=iOS Simulator,id=$SIM_UDID" \
           -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_parseOnly \
           CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
 
@@ -86,7 +101,7 @@ jobs:
         xcodebuild test \
           -scheme AdaptiveCards-Package \
           -sdk iphonesimulator \
-          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          -destination "platform=iOS Simulator,id=$SIM_UDID" \
           -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_smokeTest \
           CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
           2>&1 || true
@@ -99,7 +114,7 @@ jobs:
         xcodebuild test \
           -scheme AdaptiveCards-Package \
           -sdk iphonesimulator \
-          -destination "platform=iOS Simulator,name=iPhone 15,OS=latest" \
+          -destination "platform=iOS Simulator,id=$SIM_UDID" \
           -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_coreMatrix \
           CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
           2>&1 || true
