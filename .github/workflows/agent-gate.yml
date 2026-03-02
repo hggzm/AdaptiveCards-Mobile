@@ -128,6 +128,7 @@ jobs:
       run: |
         # Use xcodebuild to build & test only the required targets
         # This avoids building ACCopilotExtensions which has known compile issues
+        set -o pipefail
         xcodebuild test \
           -scheme AdaptiveCards-Package \
           -sdk iphonesimulator \
@@ -209,6 +210,7 @@ jobs:
     - name: Run unit tests
       working-directory: android
       run: |
+        set -o pipefail
         ./gradlew testDebugUnitTest --stacktrace 2>&1 | tee /tmp/android-unit-tests.log
         echo "### Android Unit Tests" >> $GITHUB_STEP_SUMMARY
         echo "Unit tests completed" >> $GITHUB_STEP_SUMMARY
