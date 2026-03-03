@@ -19,6 +19,13 @@ struct SelectActionModifier: ViewModifier {
                 .onTapGesture {
                     onTap(action)
                 }
+                // Add button trait so VoiceOver announces the container as
+                // interactive, and provide an accessibility hint with the
+                // action title. This prevents child headings from confusingly
+                // announcing "double tap to activate" without context
+                // (upstream #170).
+                .accessibilityAddTraits(.isButton)
+                .accessibilityHint(action.title.map { "Double tap to \($0)" } ?? "Double tap to activate")
         } else {
             content
         }

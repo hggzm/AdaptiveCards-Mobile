@@ -31,7 +31,10 @@ struct TextBlockView: View {
                 }
                 .spacing(textBlock.spacing, hostConfig: hostConfig)
                 .separator(textBlock.separator, hostConfig: hostConfig)
-                .accessibilityElement(label: textBlock.text)
+                .accessibilityElement(
+                    label: textBlock.text,
+                    traits: textBlock.style == .heading ? .isHeader : []
+                )
         } else {
             // Render plain text
             Text(textBlock.text)
@@ -42,7 +45,10 @@ struct TextBlockView: View {
                 .frame(maxWidth: .infinity, alignment: frameAlignment)
                 .spacing(textBlock.spacing, hostConfig: hostConfig)
                 .separator(textBlock.separator, hostConfig: hostConfig)
-                .accessibilityElement(label: textBlock.text)
+                .accessibilityElement(
+                    label: textBlock.text,
+                    traits: textBlock.style == .heading ? .isHeader : []
+                )
         }
     }
 
