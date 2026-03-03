@@ -28,11 +28,24 @@ struct ActionSetView: View {
         }
         .frame(maxWidth: .infinity, alignment: alignment)
         .accessibilityContainer(label: "Actions")
-        .onChange(of: viewModel.showCards) { _ in
-            // Notify VoiceOver that the layout changed so it can
-            // discover newly-revealed ShowCard content (upstream #181).
+        .onChange(of: viewModel.showCards) { newState in
+            // Notify VoiceOver that the layout changed and move focus to
+            // newly-revealed ShowCard content (upstream #181, #166).
             #if canImport(UIKit)
-            UIAccessibility.post(notification: .layoutChanged, argument: nil)
+            // Find the ShowCard that was just expanded
+            let expandedId = newState.first(where: { $0.value })?.key
+            if expandedId != nil {
+                // Post screenChanged so VoiceOver re-scans the layout and
+                // discovers the new ShowCard content. Using screenChanged
+                // instead of layoutChanged ensures focus moves to the new
+                // content rather than staying at the top (upstream #166).
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    UIAccessibility.post(notification: .screenChanged, argument: nil)
+                }
+            } else {
+                // ShowCard was collapsed — just notify layout changed
+                UIAccessibility.post(notification: .layoutChanged, argument: nil)
+            }
             #endif
         }
     }
