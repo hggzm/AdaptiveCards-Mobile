@@ -28,9 +28,15 @@ public struct NumberInputView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             if let label = input.label {
-                Text(label)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                HStack(spacing: 2) {
+                    Text(label)
+                    if input.isRequired == true {
+                        Text("*")
+                            .foregroundColor(.red)
+                    }
+                }
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
 
             numberTextField
