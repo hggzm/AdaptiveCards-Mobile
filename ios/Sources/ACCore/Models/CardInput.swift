@@ -84,7 +84,7 @@ public enum CardInput: Codable, Equatable {
         case .number(let input): return input.isRequired ?? false
         case .date(let input): return input.isRequired ?? false
         case .time(let input): return input.isRequired ?? false
-        case .toggle(let input): return false
+        case .toggle(let input): return input.isRequired ?? false
         case .choiceSet(let input): return input.isRequired ?? false
         case .rating(let input): return input.isRequired ?? false
         case .dataGrid(let input): return input.isRequired ?? false
@@ -309,6 +309,7 @@ public struct ToggleInput: Codable, Equatable {
     public var wrap: Bool?
     public var label: String?
     public var errorMessage: String?
+    public var isRequired: Bool?
     public var spacing: Spacing?
     public var separator: Bool?
     public var height: BlockElementHeight?
@@ -324,6 +325,7 @@ public struct ToggleInput: Codable, Equatable {
         wrap: Bool? = nil,
         label: String? = nil,
         errorMessage: String? = nil,
+        isRequired: Bool? = nil,
         spacing: Spacing? = nil,
         separator: Bool? = nil,
         height: BlockElementHeight? = nil,
@@ -338,6 +340,7 @@ public struct ToggleInput: Codable, Equatable {
         self.wrap = wrap
         self.label = label
         self.errorMessage = errorMessage
+        self.isRequired = isRequired
         self.spacing = spacing
         self.separator = separator
         self.height = height

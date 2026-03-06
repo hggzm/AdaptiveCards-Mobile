@@ -47,10 +47,14 @@ fun NumberInputView(
     }
     
     Column(modifier = modifier.fillMaxWidth()) {
-        // Label
+        // Label — announce "required" for TalkBack (upstream #205, #274)
         element.label?.let { label ->
+            val labelText = if (element.isRequired) "$label *" else label
             Text(
-                text = if (element.isRequired) "$label *" else label
+                text = labelText,
+                modifier = if (element.isRequired) Modifier.semantics {
+                    contentDescription = "$label, required"
+                } else Modifier
             )
         }
         
