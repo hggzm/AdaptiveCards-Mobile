@@ -90,6 +90,15 @@ jobs:
       run: |
         swift test --filter "AllCardsDiscoveryTests/testAllCards_coreMatrix" 2>&1 || true
 
+    - name: Run host config visual tests (multi-preset)
+      working-directory: ios
+      env:
+        RECORD_SNAPSHOTS: ${{ github.event.inputs.record_baselines == 'true' && '1' || '' }}
+      run: |
+        swift test --filter "HostConfigVisualTests/testRepresentativeCards_allPresets" 2>&1 || true
+
+
+
     - name: Upload baselines
       if: always()
       uses: actions/upload-artifact@v4
