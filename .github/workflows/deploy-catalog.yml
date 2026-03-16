@@ -1,0 +1,51 @@
+# Deploy visual snapshot catalog to GitHub Pages
+# Triggered after visual-regression completes, or manually
+name: Deploy Visual Catalog
+
+on:
+  workflow_run:
+    workflows: ["Visual Regression Gate"]
+    types: [completed]
+    branches: [main, "feature/*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success' ||
+      github.event.workflow_run.conclusion == 'failure'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download iOS baselines artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: visual-regression.yml
+          name: ios-baselines
+          path: _site/screenshots/ios
+          if_no_artifact_found: warn
+          search_artifacts: true
+
+      - name: Download Android baselines artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: visual-regression.yml
+          name: android-baselines
+          path: _site/screenshots/android
+          if_no_artifact_found: warn
+          search_artifacts: true
+
+      - name: Generate catalog page
+        run: python3 scripts/generate-catalog.py _site
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          force_orphan: true
