@@ -19,12 +19,16 @@ final class HostConfigVisualTests: CardSnapshotTestCase {
         case defaultConfig = "default"
         case teamsLight = "microsoft-teams-light"
         case teamsDark = "microsoft-teams-dark"
+        case evolutionLight = "ac-evolution-ios-light"
+        case evolutionDark = "ac-evolution-ios-dark"
 
         var snapshotName: String {
             switch self {
             case .defaultConfig: return "Default"
             case .teamsLight: return "TeamsLight"
             case .teamsDark: return "TeamsDark"
+            case .evolutionLight: return "EvolutionLight"
+            case .evolutionDark: return "EvolutionDark"
             }
         }
 
@@ -46,7 +50,9 @@ final class HostConfigVisualTests: CardSnapshotTestCase {
         }
     }
 
-    static let activePresets: [HostConfigPreset] = [.defaultConfig, .teamsLight, .teamsDark]
+    static let activePresets: [HostConfigPreset] = [
+        .defaultConfig, .teamsLight, .teamsDark, .evolutionLight, .evolutionDark
+    ]
 
     static let representativeCards: [String] = [
         "simple-text", "containers", "all-actions", "all-inputs",

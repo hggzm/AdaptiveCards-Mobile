@@ -119,4 +119,32 @@ class HostConfigSnapshotTests(
             }
         }
     }
+
+    // AC Evolution Light HostConfig (Figma redesign)
+    @Test
+    fun snapshot_evolutionLightConfig() {
+        val json = loadCardJson()
+        assumeNotNull("Card not found: $cardRelativePath", json)
+        val hostConfig = loadHostConfig("ac-evolution-android-light")
+        assumeNotNull("AC Evolution light config not found", hostConfig)
+        paparazzi.snapshot(name = "hc_evolutionLight_$cardName") {
+            HostConfigProvider(hostConfig = hostConfig!!) {
+                AdaptiveCardView(cardJson = json!!, viewModel = CardViewModel())
+            }
+        }
+    }
+
+    // AC Evolution Dark HostConfig (Figma redesign)
+    @Test
+    fun snapshot_evolutionDarkConfig() {
+        val json = loadCardJson()
+        assumeNotNull("Card not found: $cardRelativePath", json)
+        val hostConfig = loadHostConfig("ac-evolution-android-dark")
+        assumeNotNull("AC Evolution dark config not found", hostConfig)
+        paparazzi.snapshot(name = "hc_evolutionDark_$cardName") {
+            HostConfigProvider(hostConfig = hostConfig!!) {
+                AdaptiveCardView(cardJson = json!!, viewModel = CardViewModel())
+            }
+        }
+    }
 }
