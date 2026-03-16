@@ -50,9 +50,10 @@ jobs:
       contents: read
     
     steps:
+    steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
@@ -61,48 +62,48 @@ jobs:
     - name: Card inventory
       run: |
         echo "=== Test Card Inventory ==="
-        echo "Top-level cards: $(ls shared/test-cards/*.json 2>/dev/null | wc -l | tr -d ' ')"
-        for dir in shared/test-cards/*/; do
-          [ -d "$dir" ] && echo "$(basename $dir): $(find $dir -name '*.json' | wc -l | tr -d ' ') cards"
-        done
         echo "Total: $(find shared/test-cards -name '*.json' | wc -l | tr -d ' ') cards"
 
-    - name: Set up recording mode (xcodebuild)
+    - name: Prepare xcodebuild (hide xcodeproj so Package.swift is used)
+      working-directory: ios
+      run: |
+        # xcodebuild picks up SampleApp.xcodeproj over Package.swift
+        # Hide it so the SPM package scheme is used instead
+        mv SampleApp.xcodeproj _SampleApp.xcodeproj.bak 2>/dev/null || true
+
+    - name: Set up recording mode
       if: ${{ github.event.inputs.record_baselines == 'true' }}
       working-directory: ios
-      run: touch Tests/VisualTests/Snapshots/.record
-
-    - name: Run parse validation (all cards)
-      working-directory: ios
-      run: xcodebuild test -package-path . -scheme AdaptiveCards -destination "platform=iOS Simulator,name=iPhone 15 Pro" -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_parseOnly CODE_SIGNING_ALLOWED=NO 2>&1 | tail -30
-
-    - name: Run visual smoke test (1 config per card)
-      working-directory: ios
-      env:
-        RECORD_SNAPSHOTS: ${{ github.event.inputs.record_baselines == 'true' && '1' || '' }}
       run: |
-        if [ -n "$RECORD_SNAPSHOTS" ]; then
-          echo "🔴 RECORDING MODE — creating new baselines"
-        else
-          echo "🟢 VERIFY MODE — comparing against baselines"
-        fi
-        xcodebuild test -package-path . -scheme AdaptiveCards -destination "platform=iOS Simulator,name=iPhone 15 Pro" -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_smokeTest CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50 || true
+        mkdir -p Tests/VisualTests/Snapshots
+        touch Tests/VisualTests/Snapshots/.record
+        echo "Recording mode enabled via .record flag file"
 
-    - name: Run core matrix test (4 configs per card)
-      working-directory: ios
-      env:
-        RECORD_SNAPSHOTS: ${{ github.event.inputs.record_baselines == 'true' && '1' || '' }}
+    - name: Boot iOS Simulator
       run: |
-        xcodebuild test -package-path . -scheme AdaptiveCards -destination "platform=iOS Simulator,name=iPhone 15 Pro" -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_coreMatrix CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50 || true
+        xcrun simctl boot "iPhone 15 Pro" 2>/dev/null || true
+        xcrun simctl list devices booted
 
-    - name: Run host config visual tests (multi-preset)
+    - name: Run iOS visual tests (all)
       working-directory: ios
-      env:
-        RECORD_SNAPSHOTS: ${{ github.event.inputs.record_baselines == 'true' && '1' || '' }}
       run: |
-        xcodebuild test -package-path . -scheme AdaptiveCards -destination "platform=iOS Simulator,name=iPhone 15 Pro" -only-testing:VisualTests/HostConfigVisualTests CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50 || true
+        echo "=== Running ALL visual tests via xcodebuild ==="
+        xcodebuild test \
+          -scheme AdaptiveCards \
+          -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+          -only-testing:VisualTests \
+          -skipPackagePluginValidation \
+          CODE_SIGNING_ALLOWED=NO \
+          -resultBundlePath ../build/ios-results \
+          2>&1 | tee /tmp/ios-test-output.log | tail -100 || true
+        echo ""
+        echo "=== Test Summary ==="
+        grep -E 'Executed|TEST|PASS|FAIL|error:' /tmp/ios-test-output.log | tail -20 || true
 
-
+    - name: Restore xcodeproj
+      if: always()
+      working-directory: ios
+      run: mv _SampleApp.xcodeproj.bak SampleApp.xcodeproj 2>/dev/null || true
 
     - name: Upload baselines
       if: always()
