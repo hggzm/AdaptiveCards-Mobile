@@ -67,9 +67,14 @@ jobs:
         done
         echo "Total: $(find shared/test-cards -name '*.json' | wc -l | tr -d ' ') cards"
 
+    - name: Set up recording mode (xcodebuild)
+      if: ${{ github.event.inputs.record_baselines == 'true' }}
+      working-directory: ios
+      run: touch Tests/VisualTests/Snapshots/.record
+
     - name: Run parse validation (all cards)
       working-directory: ios
-      run: swift test --filter "VisualTests.AllCardsDiscoveryTests/testAllCards_parseOnly" 2>&1 || swift test --filter "AllCardsDiscoveryTests/testAllCards_parseOnly"
+      run: xcodebuild test -package-path . -scheme AdaptiveCards -destination "platform=iOS Simulator,name=iPhone 15 Pro" -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_parseOnly CODE_SIGNING_ALLOWED=NO 2>&1 | tail -30
 
     - name: Run visual smoke test (1 config per card)
       working-directory: ios
@@ -81,21 +86,21 @@ jobs:
         else
           echo "🟢 VERIFY MODE — comparing against baselines"
         fi
-        swift test --filter "VisualTests.AllCardsDiscoveryTests/testAllCards_smokeTest" 2>&1 || true
+        xcodebuild test -package-path . -scheme AdaptiveCards -destination "platform=iOS Simulator,name=iPhone 15 Pro" -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_smokeTest CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50 || true
 
     - name: Run core matrix test (4 configs per card)
       working-directory: ios
       env:
         RECORD_SNAPSHOTS: ${{ github.event.inputs.record_baselines == 'true' && '1' || '' }}
       run: |
-        swift test --filter "VisualTests.AllCardsDiscoveryTests/testAllCards_coreMatrix" 2>&1 || true
+        xcodebuild test -package-path . -scheme AdaptiveCards -destination "platform=iOS Simulator,name=iPhone 15 Pro" -only-testing:VisualTests/AllCardsDiscoveryTests/testAllCards_coreMatrix CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50 || true
 
     - name: Run host config visual tests (multi-preset)
       working-directory: ios
       env:
         RECORD_SNAPSHOTS: ${{ github.event.inputs.record_baselines == 'true' && '1' || '' }}
       run: |
-        swift test --filter "VisualTests.HostConfigVisualTests" 2>&1 || true
+        xcodebuild test -package-path . -scheme AdaptiveCards -destination "platform=iOS Simulator,name=iPhone 15 Pro" -only-testing:VisualTests/HostConfigVisualTests CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50 || true
 
 
 
