@@ -89,7 +89,7 @@ jobs:
       run: |
         echo "=== Running ALL visual tests via xcodebuild ==="
         xcodebuild test \
-          -scheme AdaptiveCards \
+          -scheme AdaptiveCards-Package \
           -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
           -only-testing:VisualTests \
           -skipPackagePluginValidation \
