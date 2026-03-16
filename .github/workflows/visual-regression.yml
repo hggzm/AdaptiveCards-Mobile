@@ -69,7 +69,7 @@ jobs:
 
     - name: Run parse validation (all cards)
       working-directory: ios
-      run: swift test --filter "AllCardsDiscoveryTests/testAllCards_parseOnly"
+      run: swift test --filter "VisualTests.AllCardsDiscoveryTests/testAllCards_parseOnly" 2>&1 || swift test --filter "AllCardsDiscoveryTests/testAllCards_parseOnly"
 
     - name: Run visual smoke test (1 config per card)
       working-directory: ios
@@ -81,21 +81,21 @@ jobs:
         else
           echo "🟢 VERIFY MODE — comparing against baselines"
         fi
-        swift test --filter "AllCardsDiscoveryTests/testAllCards_smokeTest" 2>&1 || true
+        swift test --filter "VisualTests.AllCardsDiscoveryTests/testAllCards_smokeTest" 2>&1 || true
 
     - name: Run core matrix test (4 configs per card)
       working-directory: ios
       env:
         RECORD_SNAPSHOTS: ${{ github.event.inputs.record_baselines == 'true' && '1' || '' }}
       run: |
-        swift test --filter "AllCardsDiscoveryTests/testAllCards_coreMatrix" 2>&1 || true
+        swift test --filter "VisualTests.AllCardsDiscoveryTests/testAllCards_coreMatrix" 2>&1 || true
 
     - name: Run host config visual tests (multi-preset)
       working-directory: ios
       env:
         RECORD_SNAPSHOTS: ${{ github.event.inputs.record_baselines == 'true' && '1' || '' }}
       run: |
-        swift test --filter "HostConfigVisualTests/testRepresentativeCards_allPresets" 2>&1 || true
+        swift test --filter "VisualTests.HostConfigVisualTests" 2>&1 || true
 
 
 
